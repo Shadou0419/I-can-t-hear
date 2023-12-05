@@ -4206,42 +4206,6 @@ return 0}}};
 }
 
 {
-'use strict';{const C3=self.C3;C3.Plugins.TiledBg=class TiledBgPlugin extends C3.SDKPluginBase{constructor(opts){super(opts)}Release(){super.Release()}}}
-{const C3=self.C3;function WrapModeToStr(wrapMode){switch(wrapMode){case 0:return"clamp-to-edge";case 1:return"repeat";case 2:return"mirror-repeat"}return"repeat"}C3.Plugins.TiledBg.Type=class TiledBgType extends C3.SDKTypeBase{constructor(objectClass,exportData){super(objectClass);this._wrapX="repeat";this._wrapY="repeat";if(exportData){this._wrapX=WrapModeToStr(exportData[0]);this._wrapY=WrapModeToStr(exportData[1])}}Release(){super.Release()}OnCreate(){this.GetImageInfo().LoadAsset(this._runtime)}LoadTextures(renderer){return this.GetImageInfo().LoadStaticTexture(renderer,
-{sampling:this._runtime.GetSampling(),wrapX:this._wrapX,wrapY:this._wrapY})}ReleaseTextures(){this.GetImageInfo().ReleaseTexture()}}}
-{const C3=self.C3;const C3X=self.C3X;const INITIALLY_VISIBLE=0;const ORIGIN=1;const IMAGE_OFFSET_X=4;const IMAGE_OFFSET_Y=5;const IMAGE_SCALE_X=6;const IMAGE_SCALE_Y=7;const IMAGE_ANGLE=8;const ENABLE_TILE_RANDOMIZATION=9;const TILE_XRANDOM=10;const TILE_YRANDOM=11;const TILE_ANGLERANDOM=12;const TILE_BLENDMARGINX=13;const TILE_BLENDMARGINY=14;const tempRect=C3.New(C3.Rect);const tempQuad=C3.New(C3.Quad);const rcTex=C3.New(C3.Rect);const qTex=C3.New(C3.Quad);C3.Plugins.TiledBg.Instance=class TiledBgInstance extends C3.SDKWorldInstanceBase{constructor(inst,
-properties){super(inst);this._imageOffsetX=0;this._imageOffsetY=0;this._imageScaleX=1;this._imageScaleY=1;this._imageAngle=0;this._enableTileRandomization=false;this._tileXRandom=0;this._tileYRandom=0;this._tileAngleRandom=0;this._tileBlendMarginX=0;this._tileBlendMarginY=0;this._ownImageInfo=null;if(properties){this.GetWorldInfo().SetVisible(!!properties[INITIALLY_VISIBLE]);this._imageOffsetX=properties[IMAGE_OFFSET_X];this._imageOffsetY=properties[IMAGE_OFFSET_Y];this._imageScaleX=properties[IMAGE_SCALE_X];
-this._imageScaleY=properties[IMAGE_SCALE_Y];this._imageAngle=C3.toRadians(properties[IMAGE_ANGLE]);this._enableTileRandomization=!!properties[ENABLE_TILE_RANDOMIZATION];this._tileXRandom=properties[TILE_XRANDOM];this._tileYRandom=properties[TILE_YRANDOM];this._tileAngleRandom=properties[TILE_ANGLERANDOM];this._tileBlendMarginX=properties[TILE_BLENDMARGINX];this._tileBlendMarginY=properties[TILE_BLENDMARGINY]}}Release(){this._ReleaseOwnImage();super.Release()}_ReleaseOwnImage(){if(this._ownImageInfo){this._ownImageInfo.Release();
-this._ownImageInfo=null}}CalculateTextureCoordsFor3DFace(areaWidth,areaHeight,outQuad){const imageInfo=this.GetCurrentImageInfo();const imageWidth=imageInfo.GetWidth();const imageHeight=imageInfo.GetHeight();const imageOffsetX=this._imageOffsetX/imageWidth;const imageOffsetY=this._imageOffsetY/imageHeight;const imageAngle=this._imageAngle;rcTex.set(0,0,areaWidth/(imageWidth*this._imageScaleX),areaHeight/(imageHeight*this._imageScaleY));rcTex.offset(-imageOffsetX,-imageOffsetY);if(imageAngle===0)outQuad.setFromRect(rcTex);
-else outQuad.setFromRotatedRect(rcTex,-imageAngle)}SetTilingShaderProgram(renderer){if(this._enableTileRandomization){const imageInfo=this.GetCurrentImageInfo();renderer.SetTileRandomizationMode();renderer.SetTileRandomizationInfo(imageInfo.GetWidth()*this._imageScaleX,imageInfo.GetHeight()*this._imageScaleY,this._tileXRandom,this._tileYRandom,this._tileAngleRandom,this._tileBlendMarginX,this._tileBlendMarginY)}else renderer.SetTextureFillMode()}Draw(renderer){const imageInfo=this.GetCurrentImageInfo();
-const texture=imageInfo.GetTexture();if(texture===null)return;this.SetTilingShaderProgram(renderer);renderer.SetTexture(texture);const imageWidth=imageInfo.GetWidth();const imageHeight=imageInfo.GetHeight();const imageOffsetX=this._imageOffsetX/imageWidth;const imageOffsetY=this._imageOffsetY/imageHeight;const wi=this.GetWorldInfo();rcTex.set(0,0,wi.GetWidth()/(imageWidth*this._imageScaleX),wi.GetHeight()/(imageHeight*this._imageScaleY));rcTex.offset(-imageOffsetX,-imageOffsetY);if(wi.HasMesh())this._DrawMesh(wi,
-renderer);else this._DrawStandard(wi,renderer)}_DrawStandard(wi,renderer){let quad=wi.GetBoundingQuad();if(this._runtime.IsPixelRoundingEnabled())quad=wi.PixelRoundQuad(quad);if(this._imageAngle===0)renderer.Quad3(quad,rcTex);else{qTex.setFromRotatedRect(rcTex,-this._imageAngle);renderer.Quad4(quad,qTex)}}_DrawMesh(wi,renderer){const transformedMesh=wi.GetTransformedMesh();if(wi.IsMeshChanged()){wi.CalculateBbox(tempRect,tempQuad,false);let quad=tempQuad;if(this._runtime.IsPixelRoundingEnabled())quad=
-wi.PixelRoundQuad(quad);let texCoords=rcTex;if(this._imageAngle!==0){qTex.setFromRotatedRect(rcTex,-this._imageAngle);texCoords=qTex}transformedMesh.CalculateTransformedMesh(wi.GetSourceMesh(),quad,texCoords);wi.SetMeshChanged(false)}transformedMesh.Draw(renderer)}GetCurrentImageInfo(){return this._ownImageInfo||this._objectClass.GetImageInfo()}IsOriginalSizeKnown(){return true}GetTexture(){return this.GetCurrentImageInfo().GetTexture()}_SetMeshChanged(){this.GetWorldInfo().SetMeshChanged(true)}_SetImageOffsetX(x){if(this._imageOffsetX===
-x)return;this._imageOffsetX=x;this._runtime.UpdateRender();this._SetMeshChanged()}_GetImageOffsetX(){return this._imageOffsetX}_SetImageOffsetY(y){if(this._imageOffsetY===y)return;this._imageOffsetY=y;this._runtime.UpdateRender();this._SetMeshChanged()}_GetImageOffsetY(){return this._imageOffsetY}_SetImageScaleX(x){if(this._imageScaleX===x)return;this._imageScaleX=x;this._runtime.UpdateRender();this._SetMeshChanged()}_GetImageScaleX(){return this._imageScaleX}_SetImageScaleY(y){if(this._imageScaleY===
-y)return;this._imageScaleY=y;this._runtime.UpdateRender();this._SetMeshChanged()}_GetImageScaleY(){return this._imageScaleY}_SetImageAngle(a){if(this._imageAngle===a)return;this._imageAngle=a;this._runtime.UpdateRender();this._SetMeshChanged()}_GetImageAngle(){return this._imageAngle}_SetTileRandomizationEnabled(e){e=!!e;if(this._enableTileRandomization===e)return;this._enableTileRandomization=e;this._runtime.UpdateRender()}_IsTileRandomizationEnabled(){return this._enableTileRandomization}_SetTileXRandom(x){if(this._tileXRandom===
-x)return;this._tileXRandom=x;if(this._IsTileRandomizationEnabled())this._runtime.UpdateRender()}_GetTileXRandom(){return this._tileXRandom}_SetTileYRandom(y){if(this._tileYRandom===y)return;this._tileYRandom=y;if(this._IsTileRandomizationEnabled())this._runtime.UpdateRender()}_GetTileYRandom(){return this._tileYRandom}_SetTileAngleRandom(a){if(this._tileAngleRandom===a)return;this._tileAngleRandom=a;if(this._IsTileRandomizationEnabled())this._runtime.UpdateRender()}_GetTileAngleRandom(){return this._tileAngleRandom}_SetTileBlendMarginX(x){if(this._tileBlendMarginX===
-x)return;this._tileBlendMarginX=x;if(this._IsTileRandomizationEnabled())this._runtime.UpdateRender()}_GetTileBlendMarginX(){return this._tileBlendMarginX}_SetTileBlendMarginY(y){if(this._tileBlendMarginY===y)return;this._tileBlendMarginY=y;if(this._IsTileRandomizationEnabled())this._runtime.UpdateRender()}_GetTileBlendMarginY(){return this._tileBlendMarginY}GetDebuggerProperties(){const propsPrefix="plugins.tiledbg.properties";return[{title:propsPrefix+".image-transform.name",properties:[{name:propsPrefix+
-".image-offset-x.name",value:this._GetImageOffsetX(),onedit:v=>this._SetImageOffsetX(v)},{name:propsPrefix+".image-offset-y.name",value:this._GetImageOffsetY(),onedit:v=>this._SetImageOffsetY(v)},{name:propsPrefix+".image-scale-x.name",value:this._GetImageScaleX()*100,onedit:v=>this._SetImageScaleX(v/100)},{name:propsPrefix+".image-scale-y.name",value:this._GetImageScaleY()*100,onedit:v=>this._SetImageScaleY(v/100)},{name:propsPrefix+".image-angle.name",value:C3.toDegrees(this._GetImageAngle()),onedit:v=>
-this._SetImageAngle(C3.toRadians(v))}]},{title:propsPrefix+".tile-randomization.name",properties:[{name:propsPrefix+".enable-tile-randomization.name",value:this._IsTileRandomizationEnabled(),onedit:v=>this._SetTileRandomizationEnabled(v)},{name:propsPrefix+".x-random.name",value:this._GetTileXRandom()*100,onedit:v=>this._SetTileXRandom(v/100)},{name:propsPrefix+".y-random.name",value:this._GetTileYRandom()*100,onedit:v=>this._SetTileYRandom(v/100)},{name:propsPrefix+".angle-random.name",value:this._GetTileAngleRandom()*
-100,onedit:v=>this._SetTileAngleRandom(v/100)},{name:propsPrefix+".blend-margin-x.name",value:this._GetTileBlendMarginX()*100,onedit:v=>this._SetTileBlendMarginX(v/100)},{name:propsPrefix+".blend-margin-y.name",value:this._GetTileBlendMarginY()*100,onedit:v=>this._SetTileBlendMarginY(v/100)}]}]}GetPropertyValueByIndex(index){switch(index){case IMAGE_OFFSET_X:return this._GetImageOffsetX();case IMAGE_OFFSET_Y:return this._GetImageOffsetY();case IMAGE_SCALE_X:return this._GetImageScaleX();case IMAGE_SCALE_Y:return this._GetImageScaleY();
-case IMAGE_ANGLE:return this._GetImageAngle();case ENABLE_TILE_RANDOMIZATION:return this._IsTileRandomizationEnabled();case TILE_XRANDOM:return this._GetTileXRandom();case TILE_YRANDOM:return this._GetTileYRandom();case TILE_ANGLERANDOM:return this._GetTileAngleRandom();case TILE_BLENDMARGINX:return this._GetTileBlendMarginX();case TILE_BLENDMARGINY:return this._GetTileBlendMarginY()}}SetPropertyValueByIndex(index,value){switch(index){case IMAGE_OFFSET_X:this._SetImageOffsetX(value);break;case IMAGE_OFFSET_Y:this._SetImageOffsetY(value);
-break;case IMAGE_SCALE_X:this._SetImageScaleX(value);break;case IMAGE_SCALE_Y:this._SetImageScaleY(value);break;case IMAGE_ANGLE:this._SetImageAngle(value);break;case ENABLE_TILE_RANDOMIZATION:this._SetTileRandomizationEnabled(!!value);break;case TILE_XRANDOM:this._SetTileXRandom(value);break;case TILE_YRANDOM:this._SetTileYRandom(value);break;case TILE_ANGLERANDOM:this._SetTileAngleRandom(value);break;case TILE_BLENDMARGINX:this._SetTileBlendMarginX(value);break;case TILE_BLENDMARGINY:this._SetTileBlendMarginY(value);
-break}}GetScriptInterfaceClass(){return self.ITiledBackgroundInstance}};const map=new WeakMap;self.ITiledBackgroundInstance=class ITiledBackgroundInstance extends self.IWorldInstance{constructor(){super();map.set(this,self.IInstance._GetInitInst().GetSdkInstance())}set imageOffsetX(x){C3X.RequireFiniteNumber(x);map.get(this)._SetImageOffsetX(x)}get imageOffsetX(){return map.get(this)._GetImageOffsetX()}set imageOffsetY(y){C3X.RequireFiniteNumber(y);map.get(this)._SetImageOffsetY(y)}get imageOffsetY(){return map.get(this)._GetImageOffsetY()}setImageOffset(x,
-y){C3X.RequireFiniteNumber(x);C3X.RequireFiniteNumber(y);const inst=map.get(this);inst._SetImageOffsetX(x);inst._SetImageOffsetY(y)}getImageOffset(){const inst=map.get(this);return[inst._GetImageOffsetX(),inst._GetImageOffsetY()]}set imageScaleX(x){C3X.RequireFiniteNumber(x);map.get(this)._SetImageScaleX(x)}get imageScaleX(){return map.get(this)._GetImageScaleX()}set imageScaleY(y){C3X.RequireFiniteNumber(y);map.get(this)._SetImageScaleY(y)}get imageScaleY(){return map.get(this)._GetImageScaleY()}setImageScale(x,
-y){C3X.RequireFiniteNumber(x);C3X.RequireFiniteNumber(y);const inst=map.get(this);inst._SetImageScaleX(x);inst._SetImageScaleY(y)}getImageScale(){const inst=map.get(this);return[inst._GetImageScaleX(),inst._GetImageScaleY()]}set imageAngle(a){C3X.RequireFiniteNumber(a);map.get(this)._SetImageAngle(a)}get imageAngle(){return map.get(this)._GetImageAngle()}set imageAngleDegrees(a){C3X.RequireFiniteNumber(a);map.get(this)._SetImageAngle(C3.toRadians(a))}get imageAngleDegrees(){return C3.toDegrees(map.get(this)._GetImageAngle())}get imageWidth(){return map.get(this).GetCurrentImageInfo().GetWidth()}get imageHeight(){return map.get(this).GetCurrentImageInfo().GetHeight()}getImageSize(){const imageInfo=
-map.get(this).GetCurrentImageInfo();return[imageInfo.GetWidth(),imageInfo.GetHeight()]}set enableTileRandomization(e){map.get(this)._SetTileRandomizationEnabled(!!e)}get enableTileRandomization(){return map.get(this)._IsTileRandomizationEnabled()}set tileXRandom(x){C3X.RequireFiniteNumber(x);map.get(this)._SetTileXRandom(x)}get tileXRandom(){return map.get(this)._GetTileXRandom()}set tileYRandom(y){C3X.RequireFiniteNumber(y);map.get(this)._SetTileYRandom(y)}get tileYRandom(){return map.get(this)._GetTileYRandom()}setTileRandom(x,
-y){C3X.RequireFiniteNumber(x);C3X.RequireFiniteNumber(y);const inst=map.get(this);inst._SetTileXRandom(x);inst._SetTileYRandom(y)}getTileRandom(){const inst=map.get(this);return[inst._GetTileXRandom(),inst._GetTileYRandom()]}set tileAngleRandom(a){C3X.RequireFiniteNumber(a);map.get(this)._SetTileAngleRandom(a)}get tileAngleRandom(){return map.get(this)._GetTileAngleRandom()}set tileBlendMarginX(x){C3X.RequireFiniteNumber(x);map.get(this)._SetTileBlendMarginX(x)}get tileBlendMarginX(){return map.get(this)._GetTileBlendMarginX()}set tileBlendMarginY(y){C3X.RequireFiniteNumber(y);
-map.get(this)._SetTileBlendMarginY(y)}get tileBlendMarginY(){return map.get(this)._GetTileBlendMarginY()}setTileBlendMargin(x,y){C3X.RequireFiniteNumber(x);C3X.RequireFiniteNumber(y);const inst=map.get(this);inst._SetTileBlendMarginX(x);inst._SetTileBlendMarginY(y)}getTileBlendMargin(){const inst=map.get(this);return[inst._GetTileBlendMarginX(),inst._GetTileBlendMarginY()]}async replaceImage(blob){C3X.RequireInstanceOf(blob,Blob);const sdkInst=map.get(this);const runtime=sdkInst.GetRuntime();const imageInfo=
-C3.New(C3.ImageInfo);imageInfo.LoadDynamicBlobAsset(runtime,blob);await imageInfo.LoadStaticTexture(runtime.GetRenderer(),{sampling:runtime.GetSampling(),wrapX:"repeat",wrapY:"repeat"});if(sdkInst.WasReleased()){imageInfo.Release();return}sdkInst._ReleaseOwnImage();sdkInst._ownImageInfo=imageInfo;runtime.UpdateRender()}}}{const C3=self.C3;C3.Plugins.TiledBg.Cnds={OnURLLoaded(){return true},OnURLFailed(){return true},IsTileRandomizationEnabled(){return this._IsTileRandomizationEnabled()}}}
-{const C3=self.C3;C3.Plugins.TiledBg.Acts={SetImageOffsetX(x){this._SetImageOffsetX(x)},SetImageOffsetY(y){this._SetImageOffsetY(y)},SetImageScaleX(x){this._SetImageScaleX(x/100)},SetImageScaleY(y){this._SetImageScaleY(y/100)},SetImageAngle(a){this._SetImageAngle(C3.toRadians(a))},SetTileRandomizationEnabled(e){this._SetTileRandomizationEnabled(e)},SetTilePosRandom(x,y){this._SetTileXRandom(x/100);this._SetTileYRandom(y/100)},SetTileAngleRandom(a){this._SetTileAngleRandom(a/100)},SetTileBlendMargin(x,
-y){this._SetTileBlendMarginX(x/100);this._SetTileBlendMarginY(y/100)},SetEffect(effect){this.GetWorldInfo().SetBlendMode(effect);this._runtime.UpdateRender()},async LoadURL(url,crossOrigin){if(this._ownImageInfo&&this._ownImageInfo.GetURL()===url)return;const runtime=this._runtime;const imageInfo=C3.New(C3.ImageInfo);try{await imageInfo.LoadDynamicAsset(runtime,url);if(!imageInfo.IsLoaded())throw new Error("image failed to load");if(this.WasReleased()){imageInfo.Release();return null}const texture=
-await imageInfo.LoadStaticTexture(runtime.GetRenderer(),{sampling:runtime.GetSampling(),wrapX:"repeat",wrapY:"repeat"});if(!texture)return}catch(err){console.error("Load image from URL failed: ",err);if(!this.WasReleased())this.Trigger(C3.Plugins.TiledBg.Cnds.OnURLFailed);return}if(this.WasReleased()){imageInfo.Release();return}this._ReleaseOwnImage();this._ownImageInfo=imageInfo;runtime.UpdateRender();await this.TriggerAsync(C3.Plugins.TiledBg.Cnds.OnURLLoaded)}}}
-{const C3=self.C3;C3.Plugins.TiledBg.Exps={ImageWidth(){return this.GetCurrentImageInfo().GetWidth()},ImageHeight(){return this.GetCurrentImageInfo().GetHeight()},ImageOffsetX(){return this._imageOffsetX},ImageOffsetY(){return this._imageOffsetY},ImageScaleX(){return this._imageScaleX*100},ImageScaleY(){return this._imageScaleY*100},ImageAngle(){return C3.toDegrees(this._imageAngle)},TileXRandom(){return this._GetTileXRandom()*100},TileYRandom(){return this._GetTileYRandom()*100},TileAngleRandom(){return this._GetTileAngleRandom()*
-100},TileBlendMarginX(){return this._GetTileBlendMarginX()*100},TileBlendMarginY(){return this._GetTileBlendMarginY()*100}}};
-
-}
-
-{
 'use strict';{const C3=self.C3;const DOM_COMPONENT_ID="text-input";C3.Plugins.TextBox=class TextInputPlugin extends C3.SDKDOMPluginBase{constructor(opts){super(opts,DOM_COMPONENT_ID);this.AddElementMessageHandler("click",(sdkInst,e)=>sdkInst._OnClick(e));this.AddElementMessageHandler("dblclick",(sdkInst,e)=>sdkInst._OnDoubleClick(e));this.AddElementMessageHandler("change",(sdkInst,e)=>sdkInst._OnChange(e))}Release(){super.Release()}}}{const C3=self.C3;C3.Plugins.TextBox.Type=class TextInputType extends C3.SDKTypeBase{constructor(objectClass){super(objectClass)}Release(){super.Release()}OnCreate(){}}}
 {const C3=self.C3;const C3X=self.C3X;const TEXT=0;const PLACEHOLDER=1;const TOOLTIP=2;const INITIALLY_VISIBLE=3;const ENABLE=4;const READ_ONLY=5;const SPELL_CHECK=6;const TYPE=7;const AUTO_FONT_SIZE=8;const ID=9;const CLASS_NAME=10;const DOM_COMPONENT_ID="text-input";const elemTypes=["text","password","email","number","tel","url","textarea","search"];C3.Plugins.TextBox.Instance=class TextInputInstance extends C3.SDKDOMInstanceBase{constructor(inst,properties){super(inst,DOM_COMPONENT_ID);this._text=
 "";this._placeholder="";this._title="";this._isEnabled=true;this._isReadOnly=false;this._spellCheck=false;this._type="text";this._autoFontSize=true;this._maxLength=-1;this._id="";this._className="";if(properties){this._text=properties[TEXT];this._placeholder=properties[PLACEHOLDER];this._title=properties[TOOLTIP];this.GetWorldInfo().SetVisible(properties[INITIALLY_VISIBLE]);this._isEnabled=properties[ENABLE];this._isReadOnly=properties[READ_ONLY];this._spellCheck=properties[SPELL_CHECK];this._type=
@@ -4353,38 +4317,6 @@ layer._SetTransform(renderer,false,offX+pxOff,offY+pxOff,effectiveViewH);for(let
 }
 
 {
-'use strict';{const C3=self.C3;const DOM_COMPONENT_ID="video";function MaybeCloseImageBitmap(imageBitmap){if(imageBitmap&&imageBitmap["close"])imageBitmap["close"]()}C3.Plugins.video=class VideoPlugin extends C3.SDKDOMPluginBase{constructor(opts){super(opts,DOM_COMPONENT_ID);this._postImageBitmaps=false;this._supportedFormats={};this._lastStateSequenceNumber=-1;this._videoState=new Map;this._runtime.AddLoadPromise(this._runtime.PostComponentMessageToDOMAsync("video","init",{"isInWorker":this._runtime.IsInWorker()}).then(result=>
-{this._postImageBitmaps=result["postImageBitmaps"];this._supportedFormats=result["supportedFormats"]}));this.AddElementMessageHandler("playback-event",(sdkInst,e)=>sdkInst._OnPlaybackEvent(e));this._runtime.AddDOMComponentMessageHandler(DOM_COMPONENT_ID,"state",e=>this._OnUpdateState(e))}Release(){super.Release()}IsPostImageBitmapsMode(){return this._postImageBitmaps}IsFormatSupported(format){return!!this._supportedFormats[format]}_OnUpdateState(stateData){const sequenceNumber=stateData["sequenceNumber"];
-if(sequenceNumber<=this._lastStateSequenceNumber){for(const o of Object.values(stateData["videoData"]))MaybeCloseImageBitmap(o["imageBitmap"]);return}this._lastStateSequenceNumber=sequenceNumber;for(const o of this._videoState.values())MaybeCloseImageBitmap(o["imageBitmap"]);this._videoState.clear();for(const [idStr,o]of Object.entries(stateData["videoData"]))this._videoState.set(parseInt(idStr,10),o)}_DeleteVideoState(elementId){this._videoState.delete(elementId)}GetVideoState(elementId){return this._videoState.get(elementId)||
-null}}}{const C3=self.C3;C3.Plugins.video.Type=class VideoType extends C3.SDKTypeBase{constructor(objectClass){super(objectClass)}Release(){super.Release()}OnCreate(){}}}
-{const C3=self.C3;const tempRect=C3.New(C3.Rect);const tempQuad=C3.New(C3.Quad);const DOM_COMPONENT_ID="video";C3.Plugins.video.Instance=class VideoInstance extends C3.SDKDOMInstanceBase{constructor(inst,properties){super(inst,DOM_COMPONENT_ID);this._webm_src="";this._mp4_src="";this._autoplay=2;this._playInBackground=false;this._videoWasPlayingOnSuspend=false;this._webGLTexture=null;this._currentTrigger=-1;this._isSettingSource=0;this._isPlaying=false;this._isPaused=false;this._hasEnded=false;this._isLooping=
-false;this._isMuted=false;this._volume=0;if(properties){this._webm_src=properties[0];this._mp4_src=properties[1];this._autoplay=properties[2];this._playInBackground=properties[3];this.GetWorldInfo().SetVisible(properties[4])}const rt=this._runtime.Dispatcher();this._disposables=new C3.CompositeDisposable(C3.Disposable.From(rt,"renderercontextlost",()=>this._OnRendererContextLost()),C3.Disposable.From(rt,"suspend",()=>this._OnSuspend()),C3.Disposable.From(rt,"resume",()=>this._OnResume()));this.CreateElement({"src":this.GetVideoSource(),
-"autoplay":this._autoplay})}Release(){this.GetPlugin()._DeleteVideoState(this.GetElementId());this._ReleaseTexture();super.Release()}_MaybeCreateTexture(renderer,w,h){if(this._webGLTexture)if(this._webGLTexture.GetWidth()===w||this._webGLTexture.GetHeight()===h)return;else this._ReleaseTexture();this._webGLTexture=renderer.CreateDynamicTexture(w,h,{sampling:this._runtime.GetSampling(),mipMap:false})}_ReleaseTexture(){if(!this._webGLTexture)return;this._runtime.GetRenderer().DeleteTexture(this._webGLTexture);
-this._webGLTexture=null}GetElementState(){return{}}DbToLinearNoCap(x){return Math.pow(10,x/20)}DbToLinear(x){const v=this.DbToLinearNoCap(x);if(!isFinite(v))return 0;return Math.max(Math.min(v,1),0)}LinearToDbNoCap(x){return Math.log(x)/Math.log(10)*20}LinearToDb(x){return this.LinearToDbNoCap(Math.max(Math.min(x,1),0))}GetVideoSource(){let src="";const plugin=this.GetPlugin();if(plugin.IsFormatSupported("video/webm")&&this._webm_src)src=this._webm_src;else if(plugin.IsFormatSupported("video/mp4")&&
-this._mp4_src)src=this._mp4_src;if(!src)return src;if(C3.IsRelativeURL(src))return this._runtime.GetAssetManager().GetMediaFileUrl(src);else return src}_OnRendererContextLost(){this._webGLTexture=null}async _OnPlaybackEvent(e){const num=e["type"];if(num===5)this._SetIsPlaying(true);else if(num===2){this._SetIsPlaying(false);this._hasEnded=true;this._isPaused=false}else if(num===6){this._SetIsPlaying(false);this._isPaused=true;this._hasEnded=false}this._currentTrigger=num;await this.TriggerAsync(C3.Plugins.video.Cnds.OnPlaybackEvent)}_SetIsPlaying(p){this._isPlaying=
-!!p;if(this._isPlaying){this._StartTicking();this._isPaused=false;this._hasEnded=false}else this._StopTicking()}_OnSuspend(){if(this._playInBackground)return;if(!this._isPlaying)return;this._videoWasPlayingOnSuspend=true;this.PostToDOMElement("pause")}_OnResume(){if(this._playInBackground)return;if(this._videoWasPlayingOnSuspend){this.PostToDOMElement("play");this._videoWasPlayingOnSuspend=false}}Draw(renderer){const wi=this.GetWorldInfo();let videoWidth=0;let videoHeight=0;let textureData=null;const isPostImageBitmapsMode=
-this.GetPlugin().IsPostImageBitmapsMode();if(isPostImageBitmapsMode){const state=this.GetMyState();if(!state)return;textureData=state["imageBitmap"];state["imageBitmap"]=null;videoWidth=state["videoWidth"];videoHeight=state["videoHeight"]}else{const videoElem=self["C3Video_GetElement"](this.GetElementId());if(!videoElem)return;videoWidth=videoElem.videoWidth;videoHeight=videoElem.videoHeight;textureData=videoElem}if(videoWidth<=0||videoHeight<=0)return;this._MaybeCreateTexture(renderer,videoWidth,
-videoHeight);if(textureData){renderer.UpdateTexture(textureData,this._webGLTexture);if(isPostImageBitmapsMode&&textureData["close"])textureData["close"]()}const videoAspect=videoWidth/videoHeight;const dispWidth=wi.GetWidth();const dispHeight=wi.GetHeight();const dispAspect=dispWidth/dispHeight;let offX=0;let offY=0;let drawWidth=0;let drawHeight=0;if(dispAspect>videoAspect){drawWidth=dispHeight*videoAspect;drawHeight=dispHeight;offX=Math.max(Math.floor((dispWidth-drawWidth)/2),0)}else{drawWidth=
-dispWidth;drawHeight=dispWidth/videoAspect;offY=Math.max(Math.floor((dispHeight-drawHeight)/2),0)}renderer.SetTexture(this._webGLTexture);tempRect.setWH(wi.GetX()+offX,wi.GetY()+offY,drawWidth,drawHeight);tempQuad.setFromRect(tempRect);renderer.Quad(tempQuad)}Tick(){this._runtime.UpdateRender()}GetMyState(){return this.GetPlugin().GetVideoState(this.GetElementId())}}}
-{const C3=self.C3;C3.Plugins.video.Cnds={IsPlaying(){return this._isPlaying},IsPaused(){return this._isPaused},HasEnded(){return this._hasEnded},IsMuted(){return this._isMuted},OnPlaybackEvent(trig){return this._currentTrigger===trig}}}
-{const C3=self.C3;C3.Plugins.video.Acts={SetSource(webmSrc,mp4Src){this._webm_src=webmSrc;this._mp4_src=mp4Src;this.PostToDOMElement("set-source",{"src":this.GetVideoSource()});this._ReleaseTexture()},SetPlaybackTime(s){this.PostToDOMElement("set-playback-time",{"time":s})},SetPlaybackRate(r){this.PostToDOMElement("set-playback-rate",{"rate":r})},SetLooping(l){l=l!==0;if(this._isLooping===l)return;this._isLooping=l;this.PostToDOMElement("set-looping",{"isLooping":l})},SetMuted(m){m=m!==0;if(this._isMuted===
-m)return;this._isMuted=m;this.PostToDOMElement("set-muted",{"isMuted":m})},SetVolume(v){if(this._volume===v)return;this._volume=v;this.PostToDOMElement("set-volume",{"volume":this.DbToLinear(v)})},Pause(){this.PostToDOMElement("pause")},Play(){this._PostToDOMElementMaybeSync("play")}}}
-{const C3=self.C3;C3.Plugins.video.Exps={PlaybackTime(){const state=this.GetMyState();return state?state["currentTime"]:0},PlaybackRate(){const state=this.GetMyState();return state?state["playbackRate"]:1},Duration(){const state=this.GetMyState();return state?state["duration"]:0},Volume(){return this._volume},VideoWidth(){const state=this.GetMyState();return state?state["videoWidth"]:0},VideoHeight(){const state=this.GetMyState();return state?state["videoHeight"]:0}}};
-
-}
-
-{
-'use strict';{const C3=self.C3;const DOM_COMPONENT_ID="file-chooser";C3.Plugins.filechooser=class FileChooserPlugin extends C3.SDKDOMPluginBase{constructor(opts){super(opts,DOM_COMPONENT_ID);this.AddElementMessageHandler("change",(sdkInst,e)=>sdkInst._OnChange(e))}Release(){super.Release()}}}{const C3=self.C3;C3.Plugins.filechooser.Type=class FileChooserType extends C3.SDKTypeBase{constructor(objectClass){super(objectClass)}Release(){super.Release()}OnCreate(){}}}
-{const C3=self.C3;const ACCEPT=0;const SELECT=1;const INITIALLY_VISIBLE=2;const ID=3;const CLASS_NAME=4;const SINGLE=0;const MULTIPLE=1;const DOM_COMPONENT_ID="file-chooser";C3.Plugins.filechooser.Instance=class FileChooserInstance extends C3.SDKDOMInstanceBase{constructor(inst,properties){super(inst,DOM_COMPONENT_ID);this._accept="";this._isMultiSelect=false;this._id="";this._className="";this._files=[];if(properties){this._accept=properties[ACCEPT];this._isMultiSelect=properties[SELECT]!==SINGLE;
-this.GetWorldInfo().SetVisible(properties[INITIALLY_VISIBLE]);this._id=properties[ID];this._className=properties[CLASS_NAME]}this.CreateElement({"id":this._id,"className":this._className})}Release(){super.Release()}GetElementState(){return{"accept":this._accept,"isMultiSelect":this._isMultiSelect}}_GetFileAt(index){index=Math.floor(index);if(index<0||index>=this._files.length)return null;return this._files[index]}async _OnChange(e){this._files=e["files"];await this.TriggerAsync(C3.Plugins.filechooser.Cnds.OnChanged)}Draw(renderer){}GetPropertyValueByIndex(index){switch(index){case ACCEPT:return this._accept;
-case SELECT:return this._isMultiSelect?MULTIPLE:SINGLE}}SetPropertyValueByIndex(index,value){switch(index,value){case ACCEPT:if(this._accept===value)return;this._accept=value;this.UpdateElementState();break;case SELECT:if(this._isMultiSelect===(value!==SINGLE))return;this._isMultiSelect=value!==SINGLE;this.UpdateElementState();break}}}}{const C3=self.C3;C3.Plugins.filechooser.Cnds={OnChanged(){return true}}}
-{const C3=self.C3;C3.Plugins.filechooser.Acts={ReleaseFile(f){URL.revokeObjectURL(f)},Click(){this._PostToDOMElementMaybeSync("click")},Clear(){this.PostToDOMElement("clear")}}}
-{const C3=self.C3;const urlCache=new WeakMap;C3.Plugins.filechooser.Exps={FileCount(){return this._files.length},FileNameAt(i){const file=this._GetFileAt(i);return file?file["name"]||"":""},FileSizeAt(i){const file=this._GetFileAt(i);return file?file["size"]||0:0},FileTypeAt(i){const file=this._GetFileAt(i);return file?file["type"]||"":""},FileURLAt(i){const file=this._GetFileAt(i);if(!file)return"";let url=urlCache.get(file);if(url)return url;url=URL.createObjectURL(file);urlCache.set(file,url);
-return url}}};
-
-}
-
-{
 'use strict';{const C3=self.C3;const DOM_COMPONENT_ID="list";C3.Plugins.List=class ListPlugin extends C3.SDKDOMPluginBase{constructor(opts){super(opts,DOM_COMPONENT_ID);this.AddElementMessageHandler("click",(sdkInst,e)=>sdkInst._OnClick(e));this.AddElementMessageHandler("dblclick",(sdkInst,e)=>sdkInst._OnDoubleClick(e));this.AddElementMessageHandler("change",(sdkInst,e)=>sdkInst._OnChange(e))}Release(){super.Release()}}}{const C3=self.C3;C3.Plugins.List.Type=class ListType extends C3.SDKTypeBase{constructor(objectClass){super(objectClass)}Release(){super.Release()}OnCreate(){}}}
 {const C3=self.C3;const C3X=self.C3X;const ITEMS=0;const TOOLTIP=1;const INITIALLY_VISIBLE=2;const ENABLE=3;const TYPE=4;const MULTI_SELECT=5;const AUTO_FONT_SIZE=6;const ID=7;const CLASS_NAME=8;const LIST_BOX=0;const DROPDOWN_LIST=1;const DOM_COMPONENT_ID="list";C3.Plugins.List.Instance=class ListInstance extends C3.SDKDOMInstanceBase{constructor(inst,properties){super(inst,DOM_COMPONENT_ID);this._items=[];this._stringItems="";this._title="";this._isEnabled=true;this._isDropdown=true;this._isMultiSelect=
 false;this._autoFontSize=true;this._id="";this._className="";this._selectedIndex=-1;this._selectedIndices=[];if(properties){const itemsStr=properties[ITEMS];this._items=itemsStr?itemsStr.split("\n"):[];this._stringItems=properties[ITEMS];this._title=properties[TOOLTIP];this.GetWorldInfo().SetVisible(!!properties[INITIALLY_VISIBLE]);this._isEnabled=!!properties[ENABLE];this._isDropdown=properties[TYPE]===DROPDOWN_LIST;this._isMultiSelect=!!properties[MULTI_SELECT];this._autoFontSize=!!properties[AUTO_FONT_SIZE];
@@ -4405,24 +4337,6 @@ map.get(this)._AddItem(str)}insertItem(index,str){C3X.RequireFiniteNumber(index)
 const itemText=this._items[i];if(case_)return itemText===text;else return C3.equalsNoCase(itemText,text)}}}
 {const C3=self.C3;C3.Plugins.List.Acts={Select(index){this._SetSelectedIndex(index)},SetTooltip(title){this._SetTooltip(title)},SetVisible(v){const wi=this.GetWorldInfo();v=v!==0;if(wi.IsVisible()===v)return;wi.SetVisible(v)},AddItem(text){this._AddItem(text)},AddItemAt(index,text){this._AddItemAt(index,text)},Remove(index){this._RemoveItem(index)},SetItemText(index,text){this._SetItemText(index,text)},Clear(){this._Clear()}}}
 {const C3=self.C3;C3.Plugins.List.Exps={ItemCount(){return this._GetItemCount()},ItemTextAt(i){return this._GetItemText(i)},SelectedIndex(){return this._GetSelectedIndex()},SelectedText(){return this._GetItemText(this._GetSelectedIndex())},SelectedCount(){return this._GetSelectedCount()},SelectedIndexAt(i){return this._GetSelectedIndexAt(i)},SelectedTextAt(i){return this._GetSelectedTextAt(i)}}};
-
-}
-
-{
-'use strict';{const C3=self.C3;C3.Plugins.Keyboard=class KeyboardPlugin extends C3.SDKPluginBase{constructor(opts){super(opts)}Release(){super.Release()}}}
-{const C3=self.C3;const C3X=self.C3X;C3.Plugins.Keyboard.Type=class KeyboardType extends C3.SDKTypeBase{constructor(objectClass){super(objectClass)}Release(){super.Release()}OnCreate(){}GetScriptInterfaceClass(){return self.IKeyboardObjectType}};let keyboardObjectType=null;function GetKeyboardSdkInstance(){return keyboardObjectType.GetSingleGlobalInstance().GetSdkInstance()}self.IKeyboardObjectType=class IKeyboardObjectType extends self.IObjectClass{constructor(objectType){super(objectType);keyboardObjectType=
-objectType;objectType.GetRuntime()._GetCommonScriptInterfaces().keyboard=this}isKeyDown(keyOrCode){const keyboardInst=GetKeyboardSdkInstance();if(typeof keyOrCode==="string")return keyboardInst.IsKeyDown(keyOrCode);else if(typeof keyOrCode==="number")return keyboardInst.IsKeyCodeDown(keyOrCode);else throw new TypeError("expected string or number");}}}
-{const C3=self.C3;C3.Plugins.Keyboard.Instance=class KeyboardInstance extends C3.SDKInstanceBase{constructor(inst,properties){super(inst);this._keysDownByString=new Set;this._keysDownByWhich=new Set;this._triggerWhich=0;this._triggerString="";this._triggerTypedKey="";const rt=this.GetRuntime().Dispatcher();this._disposables=new C3.CompositeDisposable(C3.Disposable.From(rt,"keydown",e=>this._OnKeyDown(e.data)),C3.Disposable.From(rt,"keyup",e=>this._OnKeyUp(e.data)),C3.Disposable.From(rt,"window-blur",
-()=>this._OnWindowOrKeyboardBlur()),C3.Disposable.From(rt,"keyboard-blur",()=>this._OnWindowOrKeyboardBlur()))}Release(){super.Release()}_OnKeyDown(e){const which=e["which"];const keyString=e["code"]||which.toString();const typedKey=e["key"];if(this._keysDownByString.has(keyString))return;this._keysDownByString.add(keyString);this._keysDownByWhich.add(which);this._triggerString=keyString;this._triggerWhich=which;this._triggerTypedKey=typedKey;this.Trigger(C3.Plugins.Keyboard.Cnds.OnAnyKey);this.Trigger(C3.Plugins.Keyboard.Cnds.OnKey);
-this.Trigger(C3.Plugins.Keyboard.Cnds.OnLeftRightKeyPressed);this.Trigger(C3.Plugins.Keyboard.Cnds.OnKeyCode)}_OnKeyUp(e){const which=e["which"];const keyString=e["code"]||which.toString();const typedKey=e["key"];this._keysDownByString.delete(keyString);this._keysDownByWhich.delete(which);this._triggerString=keyString;this._triggerWhich=which;this._triggerTypedKey=typedKey;this.Trigger(C3.Plugins.Keyboard.Cnds.OnAnyKeyReleased);this.Trigger(C3.Plugins.Keyboard.Cnds.OnKeyReleased);this.Trigger(C3.Plugins.Keyboard.Cnds.OnLeftRightKeyReleased);
-this.Trigger(C3.Plugins.Keyboard.Cnds.OnKeyCodeReleased)}_OnWindowOrKeyboardBlur(){for(const which of this._keysDownByWhich){this._keysDownByWhich.delete(which);this._triggerWhich=which;this.Trigger(C3.Plugins.Keyboard.Cnds.OnAnyKeyReleased);this.Trigger(C3.Plugins.Keyboard.Cnds.OnKeyReleased);this.Trigger(C3.Plugins.Keyboard.Cnds.OnKeyCodeReleased)}this._keysDownByString.clear()}IsKeyDown(str){return this._keysDownByString.has(str)}IsKeyCodeDown(which){return this._keysDownByWhich.has(which)}SaveToJson(){return{"tk":this._triggerWhich,
-"tkk":this._triggerTypedKey}}LoadFromJson(o){this._triggerWhich=o["tk"];if(o.hasOwnProperty("tkk"))this._triggerTypedKey=o["tkk"]}GetDebuggerProperties(){const prefix="plugins.keyboard";return[{title:prefix+".name",properties:[{name:prefix+".debugger.last-key-code",value:this._triggerWhich},{name:prefix+".debugger.last-key-string",value:C3.Plugins.Keyboard.Exps.StringFromKeyCode(this._triggerWhich)},{name:prefix+".debugger.last-typed-key",value:this._triggerTypedKey}]}]}}}
-{const C3=self.C3;const LEFTRIGHT_KEY_STRINGS=["ShiftLeft","ShiftRight","ControlLeft","ControlRight","AltLeft","AltRight","MetaLeft","MetaRight"];C3.Plugins.Keyboard.Cnds={IsKeyDown(which){return this._keysDownByWhich.has(which)},OnKey(which){return this._triggerWhich===which},OnAnyKey(){return true},OnAnyKeyReleased(){return true},OnKeyReleased(which){return this._triggerWhich===which},IsKeyCodeDown(which){which=Math.floor(which);return this._keysDownByWhich.has(which)},OnKeyCode(which){return this._triggerWhich===
-which},OnKeyCodeReleased(which){return this._triggerWhich===which},OnLeftRightKeyPressed(index){const keyString=LEFTRIGHT_KEY_STRINGS[index];return this._triggerString===keyString},OnLeftRightKeyReleased(index){const keyString=LEFTRIGHT_KEY_STRINGS[index];return this._triggerString===keyString},IsLeftRightKeyDown(index){const keyString=LEFTRIGHT_KEY_STRINGS[index];return this._keysDownByString.has(keyString)}}}{const C3=self.C3;C3.Plugins.Keyboard.Acts={}}
-{const C3=self.C3;function StringFromCharCode(kc){kc=Math.floor(kc);switch(kc){case 8:return"backspace";case 9:return"tab";case 13:return"enter";case 16:return"shift";case 17:return"control";case 18:return"alt";case 19:return"pause";case 20:return"capslock";case 27:return"esc";case 33:return"pageup";case 34:return"pagedown";case 35:return"end";case 36:return"home";case 37:return"\u2190";case 38:return"\u2191";case 39:return"\u2192";case 40:return"\u2193";case 45:return"insert";case 46:return"del";
-case 91:return"left window key";case 92:return"right window key";case 93:return"select";case 96:return"numpad 0";case 97:return"numpad 1";case 98:return"numpad 2";case 99:return"numpad 3";case 100:return"numpad 4";case 101:return"numpad 5";case 102:return"numpad 6";case 103:return"numpad 7";case 104:return"numpad 8";case 105:return"numpad 9";case 106:return"numpad *";case 107:return"numpad +";case 109:return"numpad -";case 110:return"numpad .";case 111:return"numpad /";case 112:return"F1";case 113:return"F2";
-case 114:return"F3";case 115:return"F4";case 116:return"F5";case 117:return"F6";case 118:return"F7";case 119:return"F8";case 120:return"F9";case 121:return"F10";case 122:return"F11";case 123:return"F12";case 144:return"numlock";case 145:return"scroll lock";case 186:return";";case 187:return"=";case 188:return",";case 189:return"-";case 190:return".";case 191:return"/";case 192:return"'";case 219:return"[";case 220:return"\\";case 221:return"]";case 222:return"#";case 223:return"`";default:return String.fromCharCode(kc)}}
-C3.Plugins.Keyboard.Exps={LastKeyCode(){return this._triggerWhich},StringFromKeyCode(kc){return StringFromCharCode(kc)},TypedKey(){return this._triggerTypedKey}}};
 
 }
 
@@ -4503,13 +4417,9 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Timeline,
 		C3.Behaviors.Flash,
 		C3.Behaviors.DragnDrop,
-		C3.Plugins.TiledBg,
 		C3.Plugins.TextBox,
 		C3.Plugins.DrawingCanvas,
-		C3.Plugins.video,
-		C3.Plugins.filechooser,
 		C3.Plugins.List,
-		C3.Plugins.Keyboard,
 		C3.Plugins.System.Cnds.IsGroupActive,
 		C3.Plugins.System.Cnds.OnLayoutStart,
 		C3.Plugins.Mouse.Cnds.OnObjectClicked,
@@ -4597,10 +4507,7 @@ self.C3_GetObjectRefTable = function () {
 		C3.ScriptsInEvents.中耳聲音傳導2事件表_Event6_Act4,
 		C3.ScriptsInEvents.中耳聲音傳導2事件表_Event7_Act2,
 		C3.Plugins.HTMLElement.Acts.SetPos,
-		C3.Plugins.Keyboard.Cnds.OnKey,
-		C3.Plugins.TextBox.Cnds.CompareText,
-		C3.Plugins.Text.Acts.AddInstanceVar,
-		C3.Plugins.Text.Cnds.CompareInstanceVar,
+		C3.Plugins.System.Acts.LoadLayoutTexturesByName,
 		C3.Plugins.Sprite.Acts.SetAnim,
 		C3.Plugins.Sprite.Cnds.IsOverlapping,
 		C3.Behaviors.DragnDrop.Acts.SetEnabled,
@@ -4633,7 +4540,6 @@ self.C3_JsPropNameTable = [
 	{B4: 0},
 	{s1Title: 0},
 	{s2Title: 0},
-	{教學內容: 0},
 	{同儕方面: 0},
 	{教學內容按鈕: 0},
 	{聽覺輔助設備的使用: 0},
@@ -4646,44 +4552,26 @@ self.C3_JsPropNameTable = [
 	{難懂的抽象概念: 0},
 	{難懂的抽象概念2: 0},
 	{圖卡: 0},
-	{多媒體: 0},
 	{s3Title: 0},
 	{同儕a10: 0},
-	{教學內容2: 0},
 	{教學提示: 0},
-	{學科: 0},
-	{數學: 0},
 	{XX: 0},
 	{音頻: 0},
 	{操作: 0},
 	{地圖: 0},
-	{訊息: 0},
 	{靜音: 0},
 	{直平板: 0},
 	{返回2: 0},
-	{有效: 0},
 	{難懂: 0},
 	{dead: 0},
 	{go: 0},
 	{橫平板: 0},
 	{鑑定: 0},
 	{安置: 0},
-	{視覺: 0},
-	{教學內容3: 0},
-	{教學內容4: 0},
 	{輔導: 0},
 	{主影片: 0},
-	{操作說明: 0},
 	{s2提示: 0},
 	{HTML元素: 0},
-	{同儕: 0},
-	{同儕A: 0},
-	{同儕b1: 0},
-	{同儕b2: 0},
-	{同儕b3: 0},
-	{同儕b4: 0},
-	{同儕b5: 0},
-	{同儕b6: 0},
 	{同儕a2: 0},
 	{同儕a3: 0},
 	{同儕a4: 0},
@@ -4694,10 +4582,7 @@ self.C3_JsPropNameTable = [
 	{Timeline: 0},
 	{橫平板2: 0},
 	{主觀: 0},
-	{客觀: 0},
 	{主客文字: 0},
-	{主客標: 0},
-	{主客框1: 0},
 	{擋: 0},
 	{對話背景: 0},
 	{對話框: 0},
@@ -4716,16 +4601,10 @@ self.C3_JsPropNameTable = [
 	{生氣男: 0},
 	{學習策略: 0},
 	{客影片: 0},
-	{主客文字2: 0},
-	{主影片標題: 0},
 	{客影片標題: 0},
-	{回s2主客: 0},
-	{回s2主: 0},
 	{回s2客: 0},
 	{小外提示: 0},
 	{對話結束: 0},
-	{同儕說明: 0},
-	{輔具: 0},
 	{助聽器原理: 0},
 	{助聽: 0},
 	{人工耳: 0},
@@ -4745,15 +4624,8 @@ self.C3_JsPropNameTable = [
 	{椅腳正確說明: 0},
 	{座位說明: 0},
 	{醫生: 0},
-	{dialogueData: 0},
-	{訊息2: 0},
-	{訊息3: 0},
 	{Text2: 0},
 	{主客觀訊息: 0},
-	{scrollPos: 0},
-	{ScrollBar: 0},
-	{DragDrop: 0},
-	{ScrollPos: 0},
 	{正反按鈕: 0},
 	{正反按鈕白: 0},
 	{反面: 0},
@@ -4777,7 +4649,6 @@ self.C3_JsPropNameTable = [
 	{窗: 0},
 	{單元2選單按鈕1: 0},
 	{next1: 0},
-	{聽損學生的安置按鈕1: 0},
 	{Sprite3: 0},
 	{物品欄: 0},
 	{窗簾: 0},
@@ -4791,7 +4662,6 @@ self.C3_JsPropNameTable = [
 	{繪圖畫布: 0},
 	{Sprite4: 0},
 	{star: 0},
-	{Sprite6: 0},
 	{題22: 0},
 	{題23題23: 0},
 	{題24: 0},
@@ -4811,11 +4681,6 @@ self.C3_JsPropNameTable = [
 	{圈圈: 0},
 	{叉: 0},
 	{單元2測驗: 0},
-	{同儕方面2: 0},
-	{單元2第三章平板: 0},
-	{調整教學內容: 0},
-	{課後練習與討論: 0},
-	{教學內容5: 0},
 	{火車: 0},
 	{Text5: 0},
 	{Text4: 0},
@@ -4870,18 +4735,9 @@ self.C3_JsPropNameTable = [
 	{next8: 0},
 	{next9: 0},
 	{next10: 0},
-	{聽覺輔具便條紙: 0},
-	{聽覺輔具: 0},
-	{Sprite5: 0},
-	{詳解下一頁1: 0},
-	{詳解上一頁1: 0},
-	{詳解下一夜2: 0},
-	{詳解上一頁2: 0},
-	{Sprite7: 0},
 	{恭喜完成第二單元: 0},
 	{回主選單: 0},
 	{再試一次: 0},
-	{視頻: 0},
 	{鼓室說明提示: 0},
 	{綠色背景確認: 0},
 	{綠色背景確認2: 0},
@@ -4933,7 +4789,6 @@ self.C3_JsPropNameTable = [
 	{圓頭箭頭5: 0},
 	{全圖字卡: 0},
 	{鐙骨和10歐分硬幣: 0},
-	{空平板無單元: 0},
 	{單元一空平板: 0},
 	{單元一首頁圖: 0},
 	{對話提示: 0},
@@ -4983,7 +4838,6 @@ self.C3_JsPropNameTable = [
 	{外耳開場: 0},
 	{外耳n1: 0},
 	{外耳n2: 0},
-	{Sprite9: 0},
 	{外耳耳廓: 0},
 	{外耳n3: 0},
 	{耳朵1: 0},
@@ -4994,8 +4848,6 @@ self.C3_JsPropNameTable = [
 	{外耳外耳道: 0},
 	{外耳返回1: 0},
 	{萬耳返回2: 0},
-	{Sprite10: 0},
-	{Sprite11: 0},
 	{返回3: 0},
 	{返回4: 0},
 	{返回5: 0},
@@ -5036,12 +4888,7 @@ self.C3_JsPropNameTable = [
 	{同儕a11: 0},
 	{同儕a12: 0},
 	{同儕a13: 0},
-	{Sprite12: 0},
-	{Sprite13: 0},
-	{文件選擇: 0},
-	{Sprite14: 0},
 	{a文本框3: 0},
-	{文件選擇2: 0},
 	{列表: 0},
 	{外甥自1: 0},
 	{Sprite15: 0},
@@ -5068,7 +4915,6 @@ self.C3_JsPropNameTable = [
 	{知道了按鈕: 0},
 	{主客觀按鈕操作提示: 0},
 	{測驗放大鏡: 0},
-	{鍵盤: 0},
 	{單元一說明: 0},
 	{單元一說明2: 0},
 	{C3: 0},
@@ -5107,7 +4953,6 @@ self.C3_JsPropNameTable = [
 	{移動到2: 0},
 	{橢圓囊字卡資訊: 0},
 	{囊斑紋先毛字卡資訊: 0},
-	{Skip3: 0},
 	{耳石膜圖: 0},
 	{兩纖毛: 0},
 	{班毛圖: 0},
@@ -5130,7 +4975,6 @@ self.C3_JsPropNameTable = [
 	{a100: 0},
 	{a101: 0},
 	{d8: 0},
-	{qq: 0},
 	{tt: 0},
 	{tt2: 0},
 	{單元三: 0},
@@ -5169,7 +5013,6 @@ self.C3_JsPropNameTable = [
 	{縱切操作: 0},
 	{Text16: 0},
 	{good: 0},
-	{Sprite24: 0},
 	{黃背景: 0},
 	{進度條1: 0},
 	{進度條2: 0},
@@ -5239,9 +5082,10 @@ self.C3_JsPropNameTable = [
 	{Sprite39: 0},
 	{Sprite40: 0},
 	{Sprite41: 0},
+	{tap: 0},
+	{氣壓操作: 0},
 	{測驗單元: 0},
 	{例: 0},
-	{同儕b: 0},
 	{單元: 0},
 	{選項: 0},
 	{startTouch: 0},
@@ -5275,7 +5119,6 @@ self.InstanceType = {
 	B4: class extends self.ISpriteInstance {},
 	s1Title: class extends self.ITextInstance {},
 	s2Title: class extends self.ITextInstance {},
-	教學內容: class extends self.ISpriteInstance {},
 	同儕方面: class extends self.ISpriteInstance {},
 	教學內容按鈕: class extends self.ISpriteInstance {},
 	聽覺輔助設備的使用: class extends self.ISpriteInstance {},
@@ -5286,44 +5129,26 @@ self.InstanceType = {
 	難懂的抽象概念: class extends self.ISpriteInstance {},
 	難懂的抽象概念2: class extends self.ISpriteInstance {},
 	圖卡: class extends self.ISpriteInstance {},
-	多媒體: class extends self.ISpriteInstance {},
 	s3Title: class extends self.ITextInstance {},
 	同儕a10: class extends self.ISpriteInstance {},
-	教學內容2: class extends self.ISpriteInstance {},
 	教學提示: class extends self.ITextInstance {},
-	學科: class extends self.ISpriteInstance {},
-	數學: class extends self.ISpriteInstance {},
 	XX: class extends self.ISpriteInstance {},
 	音頻: class extends self.IInstance {},
 	操作: class extends self.ISpriteInstance {},
 	地圖: class extends self.ISpriteInstance {},
-	訊息: class extends self.ISpriteInstance {},
 	靜音: class extends self.ISpriteInstance {},
 	直平板: class extends self.ISpriteInstance {},
 	返回2: class extends self.ISpriteInstance {},
-	有效: class extends self.ISpriteInstance {},
 	難懂: class extends self.ISpriteInstance {},
 	dead: class extends self.ISpriteInstance {},
 	go: class extends self.ITextInstance {},
 	橫平板: class extends self.ISpriteInstance {},
 	鑑定: class extends self.ISpriteInstance {},
 	安置: class extends self.ISpriteInstance {},
-	視覺: class extends self.ISpriteInstance {},
-	教學內容3: class extends self.ISpriteInstance {},
-	教學內容4: class extends self.ISpriteInstance {},
 	輔導: class extends self.ISpriteInstance {},
 	主影片: class extends self.ISpriteInstance {},
-	操作說明: class extends self.ISpriteInstance {},
 	s2提示: class extends self.ISpriteInstance {},
 	HTML元素: class extends self.IHTMLElementInstance {},
-	同儕: class extends self.ISpriteInstance {},
-	同儕A: class extends self.ISpriteInstance {},
-	同儕b1: class extends self.ISpriteInstance {},
-	同儕b2: class extends self.ISpriteInstance {},
-	同儕b3: class extends self.ISpriteInstance {},
-	同儕b4: class extends self.ISpriteInstance {},
-	同儕b5: class extends self.ISpriteInstance {},
-	同儕b6: class extends self.ISpriteInstance {},
 	同儕a2: class extends self.ISpriteInstance {},
 	同儕a3: class extends self.ISpriteInstance {},
 	同儕a4: class extends self.ISpriteInstance {},
@@ -5334,10 +5159,7 @@ self.InstanceType = {
 	Timeline: class extends self.IInstance {},
 	橫平板2: class extends self.ISpriteInstance {},
 	主觀: class extends self.ISpriteInstance {},
-	客觀: class extends self.ISpriteInstance {},
 	主客文字: class extends self.ITextInstance {},
-	主客標: class extends self.ITextInstance {},
-	主客框1: class extends self.ISpriteInstance {},
 	擋: class extends self.ISpriteInstance {},
 	對話背景: class extends self.ISpriteInstance {},
 	對話框: class extends self.ISpriteInstance {},
@@ -5354,16 +5176,10 @@ self.InstanceType = {
 	生氣男: class extends self.ISpriteInstance {},
 	學習策略: class extends self.ISpriteInstance {},
 	客影片: class extends self.ISpriteInstance {},
-	主客文字2: class extends self.ITextInstance {},
-	主影片標題: class extends self.ITextInstance {},
 	客影片標題: class extends self.ITextInstance {},
-	回s2主客: class extends self.ISpriteInstance {},
-	回s2主: class extends self.ISpriteInstance {},
 	回s2客: class extends self.ISpriteInstance {},
 	小外提示: class extends self.ITextInstance {},
 	對話結束: class extends self.ITextInstance {},
-	同儕說明: class extends self.ISpriteInstance {},
-	輔具: class extends self.ISpriteInstance {},
 	助聽器原理: class extends self.ISpriteInstance {},
 	助聽: class extends self.ISpriteInstance {},
 	人工耳: class extends self.ISpriteInstance {},
@@ -5382,12 +5198,8 @@ self.InstanceType = {
 	椅腳正確說明: class extends self.ISpriteInstance {},
 	座位說明: class extends self.ISpriteInstance {},
 	醫生: class extends self.ISpriteInstance {},
-	訊息2: class extends self.ISpriteInstance {},
-	訊息3: class extends self.ISpriteInstance {},
 	Text2: class extends self.ITextInstance {},
 	主客觀訊息: class extends self.ITextInstance {},
-	ScrollBar: class extends self.ITiledBackgroundInstance {},
-	ScrollPos: class extends self.ITiledBackgroundInstance {},
 	正反按鈕: class extends self.ISpriteInstance {},
 	正反按鈕白: class extends self.ISpriteInstance {},
 	反面: class extends self.ISpriteInstance {},
@@ -5411,7 +5223,6 @@ self.InstanceType = {
 	窗: class extends self.ISpriteInstance {},
 	單元2選單按鈕1: class extends self.ISpriteInstance {},
 	next1: class extends self.ISpriteInstance {},
-	聽損學生的安置按鈕1: class extends self.ISpriteInstance {},
 	Sprite3: class extends self.ISpriteInstance {},
 	物品欄: class extends self.ISpriteInstance {},
 	窗簾: class extends self.ISpriteInstance {},
@@ -5424,7 +5235,6 @@ self.InstanceType = {
 	繪圖畫布: class extends self.IDrawingCanvasInstance {},
 	Sprite4: class extends self.ISpriteInstance {},
 	star: class extends self.ISpriteInstance {},
-	Sprite6: class extends self.ISpriteInstance {},
 	題22: class extends self.ITextInstance {},
 	題23題23: class extends self.ITextInstance {},
 	題24: class extends self.ITextInstance {},
@@ -5444,11 +5254,6 @@ self.InstanceType = {
 	圈圈: class extends self.ISpriteInstance {},
 	叉: class extends self.ISpriteInstance {},
 	單元2測驗: class extends self.ISpriteInstance {},
-	同儕方面2: class extends self.ISpriteInstance {},
-	單元2第三章平板: class extends self.ISpriteInstance {},
-	調整教學內容: class extends self.ISpriteInstance {},
-	課後練習與討論: class extends self.ISpriteInstance {},
-	教學內容5: class extends self.ISpriteInstance {},
 	火車: class extends self.ISpriteInstance {},
 	Text5: class extends self.ITextInstance {},
 	Text4: class extends self.ITextInstance {},
@@ -5503,18 +5308,9 @@ self.InstanceType = {
 	next8: class extends self.ISpriteInstance {},
 	next9: class extends self.ISpriteInstance {},
 	next10: class extends self.ISpriteInstance {},
-	聽覺輔具便條紙: class extends self.ISpriteInstance {},
-	聽覺輔具: class extends self.ISpriteInstance {},
-	Sprite5: class extends self.ISpriteInstance {},
-	詳解下一頁1: class extends self.ISpriteInstance {},
-	詳解上一頁1: class extends self.ISpriteInstance {},
-	詳解下一夜2: class extends self.ISpriteInstance {},
-	詳解上一頁2: class extends self.ISpriteInstance {},
-	Sprite7: class extends self.ISpriteInstance {},
 	恭喜完成第二單元: class extends self.ISpriteInstance {},
 	回主選單: class extends self.ISpriteInstance {},
 	再試一次: class extends self.ISpriteInstance {},
-	視頻: class extends self.IWorldInstance {},
 	鼓室說明提示: class extends self.ISpriteInstance {},
 	綠色背景確認: class extends self.ISpriteInstance {},
 	綠色背景確認2: class extends self.ISpriteInstance {},
@@ -5565,7 +5361,6 @@ self.InstanceType = {
 	圓頭箭頭5: class extends self.ISpriteInstance {},
 	全圖字卡: class extends self.ISpriteInstance {},
 	鐙骨和10歐分硬幣: class extends self.ISpriteInstance {},
-	空平板無單元: class extends self.ISpriteInstance {},
 	單元一空平板: class extends self.ISpriteInstance {},
 	單元一首頁圖: class extends self.ISpriteInstance {},
 	對話提示: class extends self.ITextInstance {},
@@ -5615,7 +5410,6 @@ self.InstanceType = {
 	外耳開場: class extends self.IHTMLElementInstance {},
 	外耳n1: class extends self.ISpriteInstance {},
 	外耳n2: class extends self.ISpriteInstance {},
-	Sprite9: class extends self.ISpriteInstance {},
 	外耳耳廓: class extends self.IHTMLElementInstance {},
 	外耳n3: class extends self.ISpriteInstance {},
 	耳朵1: class extends self.ISpriteInstance {},
@@ -5626,8 +5420,6 @@ self.InstanceType = {
 	外耳外耳道: class extends self.IHTMLElementInstance {},
 	外耳返回1: class extends self.ISpriteInstance {},
 	萬耳返回2: class extends self.ISpriteInstance {},
-	Sprite10: class extends self.ISpriteInstance {},
-	Sprite11: class extends self.ISpriteInstance {},
 	返回3: class extends self.ISpriteInstance {},
 	返回4: class extends self.ISpriteInstance {},
 	返回5: class extends self.ISpriteInstance {},
@@ -5667,12 +5459,7 @@ self.InstanceType = {
 	同儕a11: class extends self.ISpriteInstance {},
 	同儕a12: class extends self.ISpriteInstance {},
 	同儕a13: class extends self.ISpriteInstance {},
-	Sprite12: class extends self.ISpriteInstance {},
-	Sprite13: class extends self.ISpriteInstance {},
-	文件選擇: class extends self.IWorldInstance {},
-	Sprite14: class extends self.ISpriteInstance {},
 	a文本框3: class extends self.ITextInputInstance {},
-	文件選擇2: class extends self.IWorldInstance {},
 	列表: class extends self.IListInstance {},
 	外甥自1: class extends self.ITextInstance {},
 	Sprite15: class extends self.ISpriteInstance {},
@@ -5699,7 +5486,6 @@ self.InstanceType = {
 	知道了按鈕: class extends self.ISpriteInstance {},
 	主客觀按鈕操作提示: class extends self.ISpriteInstance {},
 	測驗放大鏡: class extends self.ISpriteInstance {},
-	鍵盤: class extends self.IInstance {},
 	單元一說明: class extends self.ISpriteInstance {},
 	單元一說明2: class extends self.ISpriteInstance {},
 	C3: class extends self.ISpriteInstance {},
@@ -5736,7 +5522,6 @@ self.InstanceType = {
 	班文字卡資訊: class extends self.ISpriteInstance {},
 	橢圓囊字卡資訊: class extends self.ISpriteInstance {},
 	囊斑紋先毛字卡資訊: class extends self.ISpriteInstance {},
-	Skip3: class extends self.ISpriteInstance {},
 	耳石膜圖: class extends self.ISpriteInstance {},
 	兩纖毛: class extends self.ISpriteInstance {},
 	班毛圖: class extends self.ISpriteInstance {},
@@ -5759,7 +5544,6 @@ self.InstanceType = {
 	a100: class extends self.ISpriteInstance {},
 	a101: class extends self.ISpriteInstance {},
 	d8: class extends self.ISpriteInstance {},
-	qq: class extends self.ISpriteInstance {},
 	tt: class extends self.ISpriteInstance {},
 	tt2: class extends self.ISpriteInstance {},
 	單元三: class extends self.ISpriteInstance {},
@@ -5798,7 +5582,6 @@ self.InstanceType = {
 	縱切操作: class extends self.ISpriteInstance {},
 	Text16: class extends self.ITextInstance {},
 	good: class extends self.ISpriteInstance {},
-	Sprite24: class extends self.ISpriteInstance {},
 	黃背景: class extends self.ISpriteInstance {},
 	進度條1: class extends self.ISpriteInstance {},
 	進度條2: class extends self.ISpriteInstance {},
@@ -5868,9 +5651,10 @@ self.InstanceType = {
 	Sprite39: class extends self.ISpriteInstance {},
 	Sprite40: class extends self.ISpriteInstance {},
 	Sprite41: class extends self.ISpriteInstance {},
+	tap: class extends self.ITextInstance {},
+	氣壓操作: class extends self.ISpriteInstance {},
 	測驗單元: class extends self.ISpriteInstance {},
 	例: class extends self.ISpriteInstance {},
-	同儕b: class extends self.ISpriteInstance {},
 	單元: class extends self.ISpriteInstance {},
 	選項: class extends self.ISpriteInstance {}
 }
@@ -6066,7 +5850,6 @@ self.C3_ExpressionFuncs = [
 		() => 232,
 		() => 608,
 		() => "btn5",
-		() => "你想了解主觀還是客觀聽力檢查",
 		() => 200,
 		() => 100,
 		() => 216,
@@ -6284,15 +6067,9 @@ self.C3_ExpressionFuncs = [
 		() => 378,
 		() => 635,
 		() => 596,
-		() => "abc",
-		() => "T",
-		p => {
-			const n0 = p._GetNode(0);
-			return () => n0.ExpInstVar();
-		},
-		() => "def",
-		() => "123",
-		() => "pass",
+		() => "單元2測驗",
+		() => "單元三測驗",
+		() => "總測驗",
 		() => "標題2",
 		() => "play",
 		() => 604,
@@ -6391,13 +6168,19 @@ self.C3_ExpressionFuncs = [
 		() => 240.617121,
 		() => 285.545418,
 		() => 800,
+		() => -8,
 		() => 260,
 		() => 536,
 		() => 687,
+		() => 0.45,
+		() => 1270,
+		() => 735,
+		() => 1200,
+		() => "點",
 		() => 1282,
+		() => 410,
 		() => 424,
 		() => "題目",
-		() => -8,
 		p => {
 			const n0 = p._GetNode(0);
 			return () => (n0.ExpObject() + 1);
@@ -6407,7 +6190,6 @@ self.C3_ExpressionFuncs = [
 		() => 298,
 		() => 423,
 		() => 770,
-		() => 735,
 		() => 620,
 		() => 705,
 		() => 220,
